@@ -5,13 +5,23 @@ import React, { useEffect, useState } from 'react';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { Movie } from '@/src/types/Movie';
 import { Ionicons } from '@expo/vector-icons';
-import { getMovieTrailer, getWatchProviders, WatchProvider } from '@/src/api/tmdb';
+import { getMovieTrailer, getWatchProviders, WatchProvider, getMovieReviews, Review } from '@/src/api/tmdb';
+import ReviewCard from '@/src/components/ReviewCard';
 
 const { width } = Dimensions.get('window');
 
-// ... (a função getProviderSearchUrl continua a mesma)
-const getProviderSearchUrl = (providerName: string, movieTitle: string): string => { const encodedMovieTitle = encodeURIComponent(movieTitle); const providerUrls: { [key: string]: string } = { 'Netflix': `https://www.netflix.com/search?q=${encodedMovieTitle}`, 'Disney Plus': `https://www.disneyplus.com/search`, 'Amazon Prime Video': `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodedMovieTitle}&ie=UTF8`, 'Max': `https://play.max.com/search`, 'Star Plus': `https://www.starplus.com/search`, 'Globoplay': `https://globoplay.globo.com/busca/?q=${encodedMovieTitle}`, }; return providerUrls[providerName] || `https://www.google.com/search?q=Assistir+${encodedMovieTitle}+no+${providerName}`; };
-
+const getProviderSearchUrl = (providerName: string, movieTitle: string): string => { 
+    const encodedMovieTitle = encodeURIComponent(movieTitle); 
+    const providerUrls: { [key: string]: string } = { 
+        'Netflix': `https://www.netflix.com/search?q=${encodedMovieTitle}`, 
+        'Disney Plus': `https://www.disneyplus.com/search`, 
+        'Amazon Prime Video': `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodedMovieTitle}&ie=UTF8`, 
+        'Max': `https://play.max.com/search`, 
+        'Star Plus': `https://www.starplus.com/search`, 
+        'Globoplay': `https://globoplay.globo.com/busca/?q=${encodedMovieTitle}`, 
+    }; 
+    return providerUrls[providerName] || `https://www.google.com/search?q=Assistir+${encodedMovieTitle}+no+${providerName}`; 
+};
 
 export default function DetailsScreen() {
   const { movie: movieString } = useLocalSearchParams<{ movie: string }>();
@@ -20,6 +30,8 @@ export default function DetailsScreen() {
   const [loadingTrailer, setLoadingTrailer] = useState(true);
   const [providers, setProviders] = useState<WatchProvider[]>([]);
   const [loadingProviders, setLoadingProviders] = useState(true);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   if (!movieString) {
     return (
@@ -30,18 +42,41 @@ export default function DetailsScreen() {
   const movie: Movie = JSON.parse(movieString);
 
   useEffect(() => {
-    // ... (useEffect continua o mesmo)
-    const fetchData = async () => { setLoadingTrailer(true); setLoadingProviders(true); const trailer = await getMovieTrailer(movie.id); setTrailerKey(trailer); setLoadingTrailer(false); const providersData = await getWatchProviders(movie.id); if (providersData) { setProviders(providersData.providers); } setLoadingProviders(false); }; fetchData();
+    const fetchData = async () => {
+        setLoadingTrailer(true); 
+        setLoadingProviders(true); 
+        setLoadingReviews(true);
+        
+        const trailer = await getMovieTrailer(movie.id); 
+        setTrailerKey(trailer); 
+        setLoadingTrailer(false);
+        
+        const providersData = await getWatchProviders(movie.id); 
+        if (providersData) { 
+            setProviders(providersData.providers); 
+        } 
+        setLoadingProviders(false);
+        
+        const movieReviews = await getMovieReviews(movie.id);
+        setReviews(movieReviews);
+        setLoadingReviews(false);
+    };
+    fetchData();
   }, [movie.id]);
 
-  const handlePlayTrailer = () => { /* ... (continua o mesmo) */ if (trailerKey) { const youtubeUrl = `https://www.youtube.com/watch?v=${trailerKey}`; Linking.openURL(youtubeUrl).catch(() => Alert.alert("Erro", "Não foi possível abrir a URL do trailer.")); } };
-  const handleProviderPress = (providerName: string, movieTitle: string) => { /* ... (continua o mesmo) */ const url = getProviderSearchUrl(providerName, movieTitle); Linking.openURL(url).catch(() => Alert.alert("Erro", "Não foi possível abrir o serviço de streaming.")); };
+  const handlePlayTrailer = () => {
+      if (trailerKey) {
+          const youtubeUrl = `https://www.youtube.com/watch?v=${trailerKey}`;
+          Linking.openURL(youtubeUrl).catch(() => Alert.alert("Erro", "Não foi possível abrir a URL do trailer."));
+      }
+  };
 
-  // AQUI A MUDANÇA: Usamos o 'backdrop_path' para a imagem panorâmica
-  const imageUrl = movie.backdrop_path 
-    ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` 
-    : (movie.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : 'https://via.placeholder.com/500x750.png?text=Sem+Imagem');
+  const handleProviderPress = (providerName: string, movieTitle: string) => {
+      const url = getProviderSearchUrl(providerName, movieTitle);
+      Linking.openURL(url).catch(() => Alert.alert("Erro", "Não foi possível abrir o serviço de streaming."));
+  };
 
+  const imageUrl = movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : (movie.poster_path ? `https://image.tmdb.org/t/p/w780${movie.poster_path}` : 'https://via.placeholder.com/500x750.png?text=Sem+Imagem');
   const releaseDate = movie.release_date ? new Date(movie.release_date).toLocaleDateString('pt-BR', {timeZone: 'UTC'}) : 'Não informada';
 
   return (
@@ -49,7 +84,6 @@ export default function DetailsScreen() {
         <Stack.Screen options={{ title: movie.title }} />
         <Image source={{ uri: imageUrl }} style={styles.backdrop} />
         
-        {/* O resto do JSX continua o mesmo... */}
         <View style={styles.contentContainer}>
             <Text style={styles.title}>{movie.title}</Text>
             <View style={styles.detailsRow}>
@@ -59,25 +93,42 @@ export default function DetailsScreen() {
                     <Text style={styles.ratingText}>{movie.vote_average.toFixed(1)}</Text>
                 </View>
             </View>
+
             {loadingTrailer ? <ActivityIndicator color="#00ff00" style={styles.sectionSpacing}/> : trailerKey ? <TouchableOpacity style={styles.trailerButton} onPress={handlePlayTrailer}><Ionicons name="play" size={20} color="#fff" /><Text style={styles.trailerButtonText}>Assistir Trailer</Text></TouchableOpacity> : null}
-            {!loadingProviders && providers.length > 0 && <View style={styles.sectionSpacing}><Text style={styles.sectionTitle}>Onde Assistir</Text><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.providersContainer}>{providers.map(provider => <TouchableOpacity key={provider.provider_id} onPress={() => handleProviderPress(provider.provider_name, movie.title)}><Image source={{ uri: `https://image.tmdb.org/t/p/w200${provider.logo_path}` }} style={styles.providerLogo} /></TouchableOpacity>)}</ScrollView></View>}
+            
+            {!loadingProviders && providers.length > 0 && (
+                <View style={styles.sectionSpacing}>
+                    <Text style={styles.sectionTitle}>Onde Assistir</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.providersContainer}>
+                        {providers.map(provider => (
+                            <TouchableOpacity key={provider.provider_id} onPress={() => handleProviderPress(provider.provider_name, movie.title)}>
+                                <Image source={{ uri: `https://image.tmdb.org/t/p/w200${provider.logo_path}` }} style={styles.providerLogo} />
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
+            
             <View style={styles.sectionSpacing}>
               <Text style={styles.sectionTitle}>Sinopse</Text>
               <Text style={styles.overviewText}>{movie.overview || "Sinopse não disponível."}</Text>
             </View>
+
+            {!loadingReviews && reviews.length > 0 && (
+                <View style={styles.sectionSpacing}>
+                    <Text style={styles.sectionTitle}>Resenhas ({reviews.length})</Text>
+                    {reviews.map(review => (
+                        <ReviewCard key={review.id} review={review} />
+                    ))}
+                </View>
+            )}
         </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  // MUDANÇA AQUI: Renomeamos 'poster' para 'backdrop' e ajustamos o estilo
-  backdrop: {
-    width: '100%',
-    aspectRatio: 16 / 9, // Proporção de tela de cinema (widescreen)
-    backgroundColor: '#000',
-  },
-  // O resto dos estilos continua o mesmo...
+  backdrop: { width: '100%', aspectRatio: 16 / 9, backgroundColor: '#000' },
   container: { flex: 1, backgroundColor: '#121212' },
   contentContainer: { padding: 16 },
   title: { color: 'white', fontSize: 28, fontWeight: 'bold' },

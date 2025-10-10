@@ -5,6 +5,7 @@
  * @description Define a estrutura de um objeto de filme retornado pela API do TMDb.
  */
 export interface Movie {
+  backdrop_path: any;
   /** O identificador numérico único do filme no TMDb. */
   id: number;
   /** O título original do filme. */
