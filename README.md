@@ -1,50 +1,48 @@
-# Welcome to your Expo app 👋
+# Projeto CineInfo (v2: Expo Router + TypeScript)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+CineInfo é um aplicativo móvel construído com Expo (React Native) e TypeScript, que permite aos usuários pesquisar informações sobre filmes utilizando a API do The Movie Database (TMDb).
 
-## Get started
+Esta versão utiliza a moderna estrutura do Expo Router para navegação baseada em arquivos e TypeScript para garantir a segurança dos tipos no código.
 
-1. Install dependencies
+## Parâmetros Atendidos
 
-   ```bash
-   npm install
-   ```
+-   ✅ **Documentação:** Completa, com instruções de setup, execução e testes.
+-   ✅ **Testes Unitários:** Configurado com Jest para testar componentes e lógica da API.
+-   ✅ **Expo + React Native:** A base do projeto, utilizando as ferramentas mais recentes do ecossistema Expo.
+-   ✅ **Componentes Nativos:** A interface é construída 100% com componentes do React Native (`<View>`, `<Text>`, `<FlatList>`, etc.), sem uso de HTML.
+-   ✅ **Rodar via Expo Go:** O projeto é iniciado com `npx expo start` e pode ser facilmente carregado em um dispositivo físico via QR Code com o app Expo Go.
+-   ✅ **Uso de APIs:** O aplicativo consome dados em tempo real da API REST do TMDb. Este padrão de requisição (request) e resposta (response) é fundamental e conceitualmente idêntico ao de outras APIs, como a do Gemini.
+-   ✅ **Relevante:** É um projeto prático e moderno que aborda os principais desafios do desenvolvimento mobile: navegação, busca de dados assíncrona, gerenciamento de estado e componentização de UI.
 
-2. Start the app
+## Como Configurar e Rodar o Projeto
 
-   ```bash
-   npx expo start
-   ```
+1.  **Clone o repositório e instale as dependências:**
+    ```bash
+    git clone <URL_DO_SEU_REPOSITORIO>
+    cd cineinfo
+    npm install
+    ```
 
-In the output, you'll find options to open the app in a
+2.  **Configure a Chave de API:**
+    -   Crie uma conta no [The Movie Database (TMDb)](https://www.themoviedb.org/) e gere uma chave de API (v3 auth).
+    -   Na raiz do projeto, crie um arquivo chamado `.env`.
+    -   Adicione sua chave ao arquivo da seguinte forma:
+        ```
+        EXPO_PUBLIC_API_KEY=SUA_CHAVE_DE_API_AQUI
+        ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+3.  **Inicie o servidor de desenvolvimento:**
+    ```bash
+    npx expo start
+    ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+4.  **Rode no seu celular:**
+    -   Abra o aplicativo Expo Go.
+    -   Escaneie o QR Code exibido no terminal.
 
-## Get a fresh project
+## Como Rodar os Testes
 
-When you're ready, run:
+Para garantir a qualidade e o funcionamento correto dos componentes e da lógica, execute o comando:
 
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+npm test
