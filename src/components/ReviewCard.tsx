@@ -1,4 +1,9 @@
-// src/components/ReviewCard.tsx
+/**
+ * @file Componente para exibir uma única resenha de usuário
+ * @description Possui lógica interna para controlar a expansão de textos longos ("Ver mais...")
+ */
+
+// --- IMPORTAÇÕES ---
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
@@ -9,12 +14,21 @@ interface ReviewCardProps {
 }
 
 const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
+  // --- ESTADO INTERNO DO COMPONENTE ---
+  // "isExpanded" controla se o texto completo da resenha está visível ou não
+  // Cada card de resenha tem seu próprio estado independente
   const [isExpanded, setIsExpanded] = useState(false);
-  const maxChars = 250; // Limite de caracteres para o resumo
+  const maxChars = 250; // Limite de caracteres para o resumo da resenha
 
+  // Função para alternar o estado de expansão
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
   };
+
+
+// ---- LÓGICA DE RENDERIZAÇÃO CONDICIONAL ----
+// Se o estado for 'expanded' mostra o conteúdo completo
+// Senão, mostra apenas as primeiras 250 letras 
 
   const content = isExpanded ? review.content : `${review.content.substring(0, maxChars)}...`;
 
@@ -22,6 +36,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
     <View style={styles.container}>
       <Text style={styles.author}>{review.author}</Text>
       <Text style={styles.content}>{content}</Text>
+      {/* O botão "Ver mais/menos" só aparece se o texto original for maior que o limite. */}
       {review.content.length > maxChars && (
         <TouchableOpacity onPress={toggleExpanded}>
           <Text style={styles.toggleText}>{isExpanded ? 'Ver menos' : 'Ver mais'}</Text>

@@ -1,10 +1,18 @@
+/**
+ * @file Componente de barra de busca.
+ * @description É um "componente controlado", o que significa que seu valor (o texto)
+ * é gerenciado pelo componente pai (a HomeScreen).
+ */
+
+// --- IMPORTAÇÕES ---
+
 import React from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 
 interface SearchBarProps {
-  value: string;
-  onChangeText: (text: string) => void;
-  onSubmit: () => void;
+  value: string;   // O texto atual da busca
+  onChangeText: (text: string) => void;  // Função para atualizar o text
+  onSubmit: () => void; // Função para limpar a busca
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText, onSubmit }) => {
